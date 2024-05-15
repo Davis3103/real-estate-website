@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
-        DOCKER_IMAGE = 'devops_realestae/real-estate-website'
+        DOCKER_IMAGE = 'devops_realestae/php:8.1-apache'
     }
 
     stage('Checkout') {
