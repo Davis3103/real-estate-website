@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
-        DOCKER_IMAGE = 'devops_realestae/darealestate'
+        DOCKER_IMAGE = 'devops_realestae/real-estate-website'
     }
 
     stages {
