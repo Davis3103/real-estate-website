@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/yourusername/yourrepository.git'
+                git 'https://github.com/Davis3103/real-estate-website.git'
             }
         }
 
