@@ -67,7 +67,7 @@ $allProperties = $propertiesStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <p class="card-text"><?php echo $property['description']; ?></p>
                                 <p class="card-text">Price: &#8377;<?php echo $property['price']; ?></p>
                                 <p class="card-text">Location: <?php echo $property['location']; ?></p>
-                                <a href="#" class="btn btn-primary">View Details</a>
+                                <a href="property-details.php?id=<?php echo $property['id']; ?>" class="btn btn-primary">View Details</a>
                             </div>
                         </div>
                     </div>
@@ -96,7 +96,7 @@ $allProperties = $propertiesStmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <div class="col">
                 <div class="card">
-                    <img src="images\hemu.jpeg" class="card-img-top" alt="Team Member 1">
+                    <img src="images\WhatsApp Image 2024-05-13 at 19.08.04.jpeg" class="card-img-top" alt="Team Member 1">
                     <div class="card-body">
                         <h5 class="card-title">Hemanth</h5>
                         <p class="card-text">CEO</p>

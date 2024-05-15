@@ -13,16 +13,27 @@ try {
     exit();
 }
 
-// Fetch all users
+// Update passwords for regular users
 $stmt = $pdo->query("SELECT id, password FROM users");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Loop through users and update their passwords
 foreach ($users as $user) {
     $hashedPassword = password_hash($user['password'], PASSWORD_DEFAULT);
     $stmt = $pdo->prepare("UPDATE users SET password = :password WHERE id = :id");
     $stmt->bindParam(':password', $hashedPassword);
     $stmt->bindParam(':id', $user['id']);
+    $stmt->execute();
+}
+
+// Update passwords for admin users
+$stmt = $pdo->query("SELECT id, password FROM admins");
+$admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($admins as $admin) {
+    $hashedPassword = password_hash($admin['password'], PASSWORD_DEFAULT);
+    $stmt = $pdo->prepare("UPDATE admins SET password = :password WHERE id = :id");
+    $stmt->bindParam(':password', $hashedPassword);
+    $stmt->bindParam(':id', $admin['id']);
     $stmt->execute();
 }
 
