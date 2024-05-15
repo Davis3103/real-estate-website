@@ -3,13 +3,13 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
-        DOCKER_IMAGE = 'your-dockerhub-username/your-image-name'
+        DOCKER_IMAGE = 'devops_realestae/darealestate'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Davis3103/real-estate-website.git'
+                git 'https://github.com/yourusername/yourrepository.git'
             }
         }
 
@@ -36,7 +36,7 @@ pipeline {
                 script {
                     // Deploy your Docker container
                     sh '''
-                    docker run -d --name your-container-name -p 80:80 ${DOCKER_IMAGE}
+                    docker run -d --devopsdarealestate -p 80:80 ${DOCKER_IMAGE}
                     '''
                 }
             }
