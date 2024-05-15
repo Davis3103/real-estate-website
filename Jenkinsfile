@@ -6,12 +6,12 @@ pipeline {
         DOCKER_IMAGE = 'devops_realestae/real-estate-website'
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/Davis3103/real-estate-website.git'
-            }
-        }
+    stage('Checkout') {
+    steps {
+        git credentialsId: 'Davis3103', url: 'https://github.com/Davis3103/real-estate-website'
+    }
+}
+
 
         stage('Build') {
             steps {
