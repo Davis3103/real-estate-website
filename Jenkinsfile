@@ -1,57 +1,45 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
-        DOCKER_IMAGE = 'devops_realestae/php:8.1-apache'
-    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
 
-    stage('Checkout') {
-    steps {
-        git credentialsId: 'Davis3103', url: 'https://github.com/Davis3103/real-estate-website'
-    }
-}
-
-
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build(DOCKER_IMAGE)
+                    dockerImage = docker.build("php-website:${env.BUILD_ID}", ".")
                 }
             }
         }
 
-        stage('Push') {
+        stage('Run Docker Container') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
-                        docker.image(DOCKER_IMAGE).push()
-                    }
+                    dockerContainer = dockerImage.run("-p 8080:80")
                 }
+            }
+        }
+
+        stage('Test Website') {
+            steps {
+                // Add your testing steps here, e.g., run PHP unit tests, perform functional tests, etc.
             }
         }
 
         stage('Deploy') {
             steps {
-                script {
-                    // Deploy your Docker container
-                    sh '''
-                    docker run -d --devopsdarealestate -p 80:80 ${DOCKER_IMAGE}
-                    '''
-                }
+                // Add your deployment steps here, e.g., stop the previous container, remove the old image, and start a new container with the latest image
             }
         }
     }
 
     post {
         always {
-            cleanWs()
-        }
-        success {
-            echo 'Deployment successful!'
-        }
-        failure {
-            echo 'Deployment failed!'
+            dockerContainer.stop()
         }
     }
 }
