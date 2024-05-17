@@ -1,80 +1,46 @@
 pipeline {
     agent any
-
-    environment {
-        // Define environment variables for database credentials
-        MYSQL_ROOT_PASSWORD = 'your_password'
-        MYSQL_DATABASE = 'real_estate'
-        MYSQL_USER = 'root'
-        MYSQL_PASSWORD = 'your_password'
-    }
-
+    
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                // Checkout the branch
-                git branch: 'main', url: 'https://github.com/Davis3103/real-estate-website.git'
+                checkout scm
             }
         }
-
         stage('Build Docker Images') {
             steps {
-                // Build the Docker image for the PHP application
-                script {
-                    echo "Building Docker image for PHP application..."
-                    docker.build('php-web', '-f Dockerfile .')
-                }
+                echo 'Building Docker image for PHP application...'
+                bat 'docker build -t "php-web" -f Dockerfile .'
             }
         }
-
         stage('Deploy Containers') {
             steps {
-                script {
-                    echo "Stopping any existing containers..."
-                    sh 'docker-compose down'  // Stop any existing containers
-                    echo "Starting the Docker containers..."
-                    sh 'docker-compose up -d' // Start the containers in detached mode
-                }
+                echo 'Stopping any existing containers...'
+                bat 'docker stop php-web || echo "Container not running"'
+                bat 'docker rm php-web || echo "Container not existing"'
+                echo 'Starting new container...'
+                bat 'docker run -d --name php-web -p 84:80 php-web'
             }
         }
-
         stage('Wait for Services') {
             steps {
-                // Wait for the MySQL service to be fully up and running
-                script {
-                    echo "Waiting for MySQL service to be fully up and running..."
-                    waitUntil {
-                        try {
-                            sh 'docker exec mysql-container mysqladmin ping -h"localhost" --silent'
-                            return true
-                        } catch (Exception e) {
-                            echo "MySQL service is not up yet. Retrying..."
-                            return false
-                        }
-                    }
-                }
+                echo 'Waiting for services to start...'
+                // Add a delay if necessary
+                sleep(time: 30, unit: 'SECONDS')
             }
         }
-
         stage('Run Tests') {
             steps {
-                // Add steps to run your tests here (e.g., using PHPUnit or any other testing framework)
                 echo 'Running tests...'
-                // sh 'vendor/bin/phpunit'  // Uncomment and adjust this line according to your testing setup
+                // Add commands to run your tests here
             }
         }
     }
-
+    
     post {
         always {
-            // Clean up the workspace
-            echo "Cleaning up the workspace..."
+            echo 'Cleaning up the workspace...'
             cleanWs()
-        }
-        success {
-            echo 'Deployment succeeded!'
-        }
-        failure {
             echo 'Deployment failed!'
         }
     }
