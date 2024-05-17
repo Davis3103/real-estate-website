@@ -1,46 +1,62 @@
-version: '3.8'
+version: "3"
 
 services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: php-web
+  # Database
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7
     volumes:
-      - .:/var/www/html
+      - db_data:/var/lib/mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: real_estate
+      MYSQL_PASSWORD: password
+    networks:
+      - mysql-phpmyadmin
+
+  # phpMyAdmin
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8090:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: password
+    networks:
+      - mysql-phpmyadmin
+
+  # PHP with Apache
+  web:
+    image: php:8.1-apache
+    volumes:
+      - ./www:/var/www/html
+    restart: always
     ports:
       - "8084:80"
     networks:
-      - app-network
+      - mysql-phpmyadmin
     depends_on:
-      - mysql-container
+      - db
+    build:
+      context: .
+      dockerfile: inline
+    dockerfile: |
+      FROM php:8.1-apache
 
-  mysql-container:
-    image: mysql:5.7
-    container_name: mysql-container
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: your_password
-      MYSQL_DATABASE: real_estate
-      MYSQL_USER: root
-      MYSQL_PASSWORD: your_password
-    ports:
-      - "3306:3306"
-    networks:
-      - app-network
+      # Install PDO MySQL extension
+      RUN docker-php-ext-install pdo_mysql
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    restart: always
-    ports:
-      - "8181:80"
-    environment:
-      PMA_HOST: mysql-container
-      MYSQL_ROOT_PASSWORD: your_password
-    networks:
-      - app-network
+      # Enable Apache mod_rewrite (optional, if needed)
+      RUN a2enmod rewrite
 
 networks:
-  app-network:
-    driver: bridge
+  mysql-phpmyadmin:
+
+volumes:
+  db_data:
