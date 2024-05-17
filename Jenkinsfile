@@ -12,8 +12,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Clone the repository containing the Dockerfile, docker-compose.yml, and your PHP application
-                git 'https://github.com/Davis3103/real-estate-website.git'
+                // Checkout the branch
+                git branch: 'main', url: 'https://github.com/Davis3103/real-estate-website.git'
             }
         }
 
@@ -21,6 +21,7 @@ pipeline {
             steps {
                 // Build the Docker image for the PHP application
                 script {
+                    echo "Building Docker image for PHP application..."
                     docker.build('php-web', '-f Dockerfile .')
                 }
             }
@@ -28,9 +29,10 @@ pipeline {
 
         stage('Deploy Containers') {
             steps {
-                // Deploy the Docker containers using docker-compose
                 script {
+                    echo "Stopping any existing containers..."
                     sh 'docker-compose down'  // Stop any existing containers
+                    echo "Starting the Docker containers..."
                     sh 'docker-compose up -d' // Start the containers in detached mode
                 }
             }
@@ -40,11 +42,13 @@ pipeline {
             steps {
                 // Wait for the MySQL service to be fully up and running
                 script {
+                    echo "Waiting for MySQL service to be fully up and running..."
                     waitUntil {
                         try {
                             sh 'docker exec mysql-container mysqladmin ping -h"localhost" --silent'
                             return true
                         } catch (Exception e) {
+                            echo "MySQL service is not up yet. Retrying..."
                             return false
                         }
                     }
@@ -64,6 +68,7 @@ pipeline {
     post {
         always {
             // Clean up the workspace
+            echo "Cleaning up the workspace..."
             cleanWs()
         }
         success {
