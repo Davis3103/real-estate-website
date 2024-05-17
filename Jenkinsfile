@@ -7,3 +7,8 @@ pipeline {
                 checkout scm
             }
         }
+        
+    
+        // Add more stages as needed
+    }
+}
