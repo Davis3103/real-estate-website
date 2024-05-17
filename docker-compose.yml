@@ -17,7 +17,7 @@ services:
     networks:
       - mysql-phpmyadmin
 
-  # phpmyadmin
+  # phpMyAdmin
   phpmyadmin:
     depends_on:
       - db
@@ -30,6 +30,30 @@ services:
       MYSQL_ROOT_PASSWORD: password
     networks:
       - mysql-phpmyadmin
+
+  # PHP with Apache
+  web:
+    image: php:8.1-apache
+    volumes:
+      - ./www:/var/www/html
+    restart: always
+    ports:
+      - "8084:80"
+    networks:
+      - mysql-phpmyadmin
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: inline
+    dockerfile: |
+      FROM php:8.1-apache
+
+      # Install PDO MySQL extension
+      RUN docker-php-ext-install pdo_mysql
+
+      # Enable Apache mod_rewrite (optional, if needed)
+      RUN a2enmod rewrite
 
 networks:
   mysql-phpmyadmin:
