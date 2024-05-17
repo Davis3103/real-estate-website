@@ -1,24 +1,74 @@
 pipeline {
     agent any
 
+    environment {
+        // Define environment variables for database credentials
+        MYSQL_ROOT_PASSWORD = 'your_password'
+        MYSQL_DATABASE = 'real_estate'
+        MYSQL_USER = 'root'
+        MYSQL_PASSWORD = 'your_password'
+    }
+
     stages {
-        stage('checkout') {
+        stage('Checkout') {
             steps {
-                checkout scm
+                // Clone the repository containing the Dockerfile, docker-compose.yml, and your PHP application
+                git 'https://github.com/Davis3103/real-estate-website.git'
             }
         }
-        
-    
-        stage('Deploy Mysql Container') {
-    steps {
-        script {
-            // Change directory to where docker-compose.yml is located
-            dir("${env.WORKSPACE}\\my_nextjs_app") {
-                // Run docker-compose up to deploy Mysql container
-                bat 'docker-compose up -d'
+
+        stage('Build Docker Images') {
+            steps {
+                // Build the Docker image for the PHP application
+                script {
+                    docker.build('php-web', '-f Dockerfile .')
+                }
+            }
+        }
+
+        stage('Deploy Containers') {
+            steps {
+                // Deploy the Docker containers using docker-compose
+                sh 'docker-compose down'  // Stop any existing containers
+                sh 'docker-compose up -d' // Start the containers in detached mode
+            }
+        }
+
+        stage('Wait for Services') {
+            steps {
+                // Wait for the MySQL service to be fully up and running
+                script {
+                    waitUntil {
+                        try {
+                            sh 'docker exec mysql-container mysqladmin ping -h"localhost" --silent'
+                            return true
+                        } catch (Exception e) {
+                            return false
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                // Add steps to run your tests here (e.g., using PHPUnit or any other testing framework)
+                echo 'Running tests...'
+                // sh 'vendor/bin/phpunit'  // Uncomment and adjust this line according to your testing setup
             }
         }
     }
-}
+
+    post {
+        always {
+            // Clean up the workspace
+            cleanWs()
+        }
+        success {
+            echo 'Deployment succeeded!'
+        }
+        failure {
+            echo 'Deployment failed!'
+        }
     }
 }
