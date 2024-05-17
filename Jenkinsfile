@@ -2,55 +2,28 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout SCM') {
+        stage('Build') {
             steps {
-                checkout scm
+                sh 'docker-compose build'
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Run') {
             steps {
-                echo 'Building Docker image for PHP application...'
-                bat 'docker build -t "php-web" -f Dockerfile .'
+                sh 'docker-compose up -d'
             }
         }
 
-        stage('Deploy Containers') {
+        stage('Test') {
             steps {
-                echo 'Stopping any existing containers...'
-                script {
-                    def stopContainer = bat(script: 'docker stop php-web || exit 0', returnStatus: true)
-                    if (stopContainer != 0) {
-                        echo "Container php-web was not running or could not be stopped."
-                    }
-                }
-                echo 'Starting new container...'
-                bat 'docker run -d --name php-web -p 82:80 php-web'
+                sh 'docker-compose exec php-app php /var/www/html/test.php'
             }
         }
 
-        stage('Wait for Services') {
+        stage('Stop') {
             steps {
-                echo 'Waiting for the service to be ready...'
-                // Add any necessary checks or delays to ensure the service is up
+                sh 'docker-compose down'
             }
-        }
-
-        stage('Run Tests') {
-            steps {
-                echo 'Running tests...'
-                // Add your test steps here
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Cleaning up the workspace...'
-            cleanWs()
-        }
-        failure {
-            echo 'Deployment failed!'
         }
     }
 }
