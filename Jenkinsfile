@@ -9,21 +9,21 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    docker-compose -f docker-compose.yml build
+                    sh 'docker-compose -f docker-compose.yml build'
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    docker-compose -f docker-compose.yml up --abort-on-container-exit
+                    sh 'docker-compose -f docker-compose.yml up --abort-on-container-exit'
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    docker-compose -f docker-compose.yml up -d
+                    sh 'docker-compose -f docker-compose.yml up -d'
                 }
             }
         }
