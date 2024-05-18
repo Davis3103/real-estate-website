@@ -12,7 +12,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building Docker containers...'
-                bat 'docker-compose -f "C://Users//Aakash//Desktop//travel//docker-compose.yml" up -d --build'
+                bat 'docker-compose -f "https://github.com/Davis3103/real-estate-website/blob/main/docker-compose.yml" up -d --build'
             }
         }
 
