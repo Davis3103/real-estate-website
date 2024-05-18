@@ -1,28 +1,52 @@
-# docker-compose.yml
-version: '3.8'
+version: '4.30'
 
 services:
-  web:
-    build: .
-    container_name: php-web
+  www:
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "8085:80"
+      - "8004:80"
     volumes:
-      - .:/var/www/html
+      - ./www:/var/www/html
     depends_on:
-      - db
+      - mysql_container
+    networks:
+      - real-estate-website_network
 
-  db:
+  mysql_container:
     image: mysql:5.7
-    container_name: mysql-container
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: your_password
       MYSQL_DATABASE: real_estate
+      MYSQL_USER: root
+      MYSQL_PASSWORD: your_password
     ports:
-      - "3306:3306"
+      - "3310:3310"
     volumes:
-      - db_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+      - mysql_container_data:/var/lib/mysql
+    networks:
+      - real-estate-website_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "82:80"
+    environment:
+      MYSQL_ROOT_PASSWORD: your_password
+      MYSQL_USER: root
+      MYSQL_PASSWORD: your_password
+      PMA_HOST: mysql_container  # Add this line to specify the MySQL hostname
+    networks:
+      - real-estate-website_network
+    depends_on:
+      - mysql_container
+
+networks:
+  real-estate-website_network:
 
 volumes:
-  db_data:
+  mysql_container_data:
