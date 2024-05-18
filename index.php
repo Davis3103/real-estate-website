@@ -10,10 +10,10 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_email'])) {
 // Include the header
 include 'includes/header.php';
 // Database connection
-$host = 'mysql-container';
+$host = 'db';
 $dbname = 'real_estate';
 $username = 'root';
-$password = 'your_password';
+$password = 'password';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
