@@ -3,22 +3,22 @@ services:
   web:
     build: .
     ports:
-      - "80:80"
+      - "88:80"
     volumes:
       - .:/var/www/html
   db:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: your_password
+      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: real_estate
       MYSQL_USER: root
-      MYSQL_PASSWORD: your_password
+      MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
-      PMA_HOST: db
-      MYSQL_ROOT_PASSWORD: your_password
+      PMA_HOST: my
+      MYSQL_ROOT_PASSWORD: rootpassword
     ports:
-      - "8080:80"
+      - "8086:80"
