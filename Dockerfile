@@ -1,12 +1,5 @@
-# Dockerfile
-FROM php:8.1-apache
+# Use an existing Apache PHP image
+FROM php:7.4-apache
 
-RUN docker-php-ext-install pdo_mysql
+RUN docker-php-ext-install mysqli
 
-COPY . /var/www/html/
-
-# Ensure Apache's mod_rewrite is enabled
-RUN a2enmod rewrite
-
-# Expose port 80
-EXPOSE 80
