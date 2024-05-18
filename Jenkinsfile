@@ -1,24 +1,29 @@
 pipeline {
     agent any
     stages {
+        stage('Clone repository') {
+            steps {
+                git 'https://github.com/Davis3103/real-estate-website.git'
+            }
+        }
         stage('Build') {
             steps {
                 script {
-                    dockerCompose.build()
+                    docker-compose -f docker-compose.yml build
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    dockerCompose.up('--abort-on-container-exit')
+                    docker-compose -f docker-compose.yml up --abort-on-container-exit
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    dockerCompose.up('-d')
+                    docker-compose -f docker-compose.yml up -d
                 }
             }
         }
