@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Davis3103/real-estate-website.git' // Replace with your repository URL
+                git branch: 'main', url: 'https://github.com/Davis3103/real-estate-website.git' // Replace with your branch name if different
             }
         }
 
@@ -17,6 +17,15 @@ pipeline {
                 script {
                     sh "${DOCKER_COMPOSE} down"
                     sh "${DOCKER_COMPOSE} up -d --build"
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    // Example command to run PHPUnit tests
+                    sh 'docker exec php-web vendor/bin/phpunit'
                 }
             }
         }
