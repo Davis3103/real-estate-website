@@ -1,31 +1,38 @@
 pipeline {
     agent any
+
+    environment {
+        DOCKER_COMPOSE = '/usr/local/bin/docker-compose' // Path to docker-compose
+    }
+
     stages {
-        stage('Clone repository') {
+        stage('Checkout') {
             steps {
-                git 'https://github.com/Davis3103/real-estate-website.git'
+                git 'https://github.com/Davis3103/real-estate-website.git' // Replace with your repository URL
             }
         }
-        stage('Build') {
+
+        stage('Build and Run Containers') {
             steps {
                 script {
-                    sh 'docker-compose -f docker-compose.yml build'
+                    sh "${DOCKER_COMPOSE} down"
+                    sh "${DOCKER_COMPOSE} up -d --build"
                 }
             }
         }
-        stage('Test') {
+
+        stage('Cleanup') {
             steps {
                 script {
-                    sh 'docker-compose -f docker-compose.yml up --abort-on-container-exit'
+                    sh "${DOCKER_COMPOSE} down"
                 }
             }
         }
-        stage('Deploy') {
-            steps {
-                script {
-                    sh 'docker-compose -f docker-compose.yml up -d'
-                }
-            }
+    }
+
+    post {
+        always {
+            cleanWs()
         }
     }
 }
